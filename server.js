@@ -7,9 +7,10 @@ app.get('*', (request, response) => {
 	//set up response header
 	response.setHeader('Content-Type', 'application/json');
 
-	//get the ip address, but cut off the port number
-	var ipAddr = request.headers.host;
-	ipAddr = ipAddr.slice(0, ipAddr.indexOf(':'));
+	//get the user's ip address and trim off the prefix, if it exists
+	var ipAddr = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+	var lastColonIdx = ipAddr.lastIndexOf(':');
+	if (lastColonIdx !== -1) ipAddr = ipAddr.slice(lastColonIdx + 1);
 
 	//get the accept-language header and slice off the additional data
 	var primaryLanguage = request.headers['accept-language'];
